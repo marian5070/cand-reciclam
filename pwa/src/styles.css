@@ -1,0 +1,239 @@
+@import "tailwindcss";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+
+@theme {
+  --color-sage-50:  oklch(98% 0.008 140);
+  --color-sage-100: oklch(94% 0.015 140);
+  --color-sage-200: oklch(88% 0.03 142);
+  --color-sage-300: oklch(78% 0.06 145);
+  --color-sage-400: oklch(68% 0.09 148);
+  --color-sage-500: oklch(58% 0.12 150);
+  --color-sage-600: oklch(48% 0.13 152);
+  --color-sage-700: oklch(38% 0.11 155);
+  --color-sage-800: oklch(28% 0.08 158);
+  --color-sage-900: oklch(18% 0.05 160);
+  --color-sage-950: oklch(10% 0.03 162);
+
+  --color-amber-400: oklch(78% 0.13 70);
+  --color-amber-500: oklch(72% 0.15 65);
+  --color-amber-600: oklch(65% 0.16 60);
+
+  --color-rose-500: oklch(62% 0.18 25);
+  --color-blue-500: oklch(62% 0.14 245);
+
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Semantic tokens — light defaults + dark overrides
+ * Contrast targets (WCAG AA):
+ *   body text (fg) on bg: ≥7:1 (AAA)
+ *   muted on bg:          ≥4.5:1 (AA) — labels, captions, secondary content
+ *   subtle on bg:         ≥3:1  — truly tertiary (tagline, hints)
+ */
+:root {
+  --color-bg:      oklch(98% 0.008 140);
+  --color-surface: #ffffff;
+  --color-fg:      oklch(18% 0.02 160);
+  --color-muted:   oklch(32% 0.04 155);   /* was 38% chroma 0.11 — darkened + desat for body readability */
+  --color-subtle:  oklch(48% 0.03 155);   /* for footer tagline, hints, timestamps */
+  --color-border:  oklch(86% 0.025 142);
+  /* Accent — brand green adapts per mode (darker on light, brighter on dark) */
+  --color-accent:        oklch(48% 0.13 152);  /* sage-600 */
+  --color-accent-strong: oklch(38% 0.11 155);  /* sage-700 */
+  /* Tinted surface variants — adaptive. Use these instead of bg-sage-50/100
+     when there's any fg-colored text on top, otherwise dark mode breaks. */
+  --color-surface-tinted: oklch(96% 0.02 142);   /* subtle tinted bg (like sage-50) */
+  --color-avatar-bg:      oklch(92% 0.04 142);   /* round pill/avatar bg */
+  --color-avatar-fg:      oklch(38% 0.11 155);   /* text on avatar-bg */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg:      oklch(13% 0.02 162);
+    --color-surface: oklch(22% 0.028 160);  /* 9% delta — clear card separation */
+    --color-fg:      oklch(97% 0.01 140);
+    --color-muted:   oklch(84% 0.03 150);
+    --color-subtle:  oklch(72% 0.03 150);
+    --color-border:  oklch(32% 0.035 160);
+  }
+}
+
+.dark {
+  --color-bg:      oklch(13% 0.02 162);
+  --color-surface: oklch(22% 0.028 160);
+  --color-fg:      oklch(97% 0.01 140);
+  --color-muted:   oklch(84% 0.03 150);
+  --color-subtle:  oklch(72% 0.03 150);
+  --color-border:  oklch(32% 0.035 160);
+  --color-accent:        oklch(78% 0.09 148);  /* sage-300 brighter for dark bg */
+  --color-accent-strong: oklch(88% 0.05 142);  /* sage-200 almost white-green */
+  --color-surface-tinted: oklch(27% 0.035 158);  /* tinted variant of surface — darker mode */
+  --color-avatar-bg:      oklch(32% 0.05 155);
+  --color-avatar-fg:      oklch(88% 0.05 142);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+html {
+  font-size: 17px; /* baseline ușor mai mare pentru lizibilitate confortabilă */
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  background: var(--color-bg);
+  color: var(--color-fg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: 2px solid oklch(58% 0.12 150);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--color-fg) 20%, transparent);
+  border-radius: 999px;
+}
+
+@view-transition { navigation: auto; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 400ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+.ambient-mesh {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 60% at 20% 30%, color-mix(in oklch, var(--mesh-a, oklch(70% 0.08 150)) 40%, transparent) 0%, transparent 60%),
+    radial-gradient(50% 50% at 80% 20%, color-mix(in oklch, var(--mesh-b, oklch(55% 0.12 160)) 35%, transparent) 0%, transparent 55%),
+    radial-gradient(65% 55% at 60% 85%, color-mix(in oklch, var(--mesh-c, oklch(60% 0.06 130)) 30%, transparent) 0%, transparent 60%);
+  filter: blur(40px) saturate(1.1);
+  animation: mesh-drift 22s linear infinite;
+  z-index: 0;
+}
+
+@keyframes mesh-drift {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%  { transform: translate3d(-2%, 1%, 0) rotate(1deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-mesh { animation: none; }
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.25;
+  mix-blend-mode: overlay;
+}
+
+@supports (animation-timeline: view()) {
+  .rail-card {
+    animation: rail-enter linear both;
+    animation-timeline: view(inline);
+    animation-range: entry 0% cover 30%;
+  }
+
+  @keyframes rail-enter {
+    from {
+      opacity: 0.3;
+      transform: scale(0.94);
+      filter: blur(2px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+}
+
+.countdown-breathe {
+  font-variation-settings: "wght" 560, "slnt" 0;
+  transition: font-variation-settings 600ms var(--ease-out-quart);
+}
+
+.countdown-breathe.imminent {
+  font-variation-settings: "wght" 640, "slnt" -2;
+}
+
+.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--color-fg);
+  color: var(--color-bg);
+  transition: transform 200ms var(--ease-out-quart), opacity 200ms;
+  border: none;
+  cursor: pointer;
+}
+.cta-primary:hover { transform: scale(1.02); }
+.cta-primary:active { transform: scale(0.98); }
+
+/* Readable article/legal pages */
+.prose-ro {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--color-fg);
+}
+.prose-ro h2 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin-top: 2.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-fg);
+}
+.prose-ro p {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.prose-ro ul {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.prose-ro li {
+  margin-top: 0.35rem;
+}
+.prose-ro a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in oklch, var(--color-accent) 45%, transparent);
+}
+.prose-ro a:hover {
+  color: var(--color-accent-strong);
+  text-decoration-color: var(--color-accent-strong);
+}
+.prose-ro strong {
+  color: var(--color-fg);
+  font-weight: 600;
+}

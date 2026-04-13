@@ -1,0 +1,22 @@
+node_modules/
+dist/
+*.log
+.env
+!.env.example
+.DS_Store
+.vscode/
+.idea/
+coverage/
+
+# Spike raw scrape outputs (regenerable, ~5MB bloat)
+scripts/spike-*/raw/
+
+# Misc
+*.tsbuildinfo
+.cache/
+
+# Claude Code workspace metadata
+.claude/
+
+# Backups
+.git.backup-*/

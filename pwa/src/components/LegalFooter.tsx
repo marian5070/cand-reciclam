@@ -88,6 +88,12 @@ export function LegalFooter() {
             </div>
             <ul className="space-y-1.5 text-sm">
               <li>
+                <a href="https://avizo.ro" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
+                  Avizo — alerte de conformitate pentru firme
+                  <span className="block text-xs text-[color:var(--color-subtle)]">avizo.ro</span>
+                </a>
+              </li>
+              <li>
                 <a href="https://tv.madeinro.eu" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
                   Ghid TV, cinema streaming și teatru
                   <span className="block text-xs text-[color:var(--color-subtle)]">tv.madeinro.eu</span>

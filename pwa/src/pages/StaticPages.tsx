@@ -93,8 +93,8 @@ export function AboutPage() {
       <h2>Cum colectăm datele</h2>
       <p>
         Scraperele S1 și S2 rulează automat pe snapshot-uri ale site-urilor oficiale.
-        Codul lor este <a href="https://github.com/marianhp" target="_blank" rel="nofollow noopener noreferrer">public</a> (când repo-ul
-        e publicat). Pentru S3-S6, informațiile sunt curate manual din surse
+        Codul lor este <a href="https://github.com/marian5070/cand-reciclam" target="_blank" rel="noopener noreferrer">public pe GitHub</a>.
+        Pentru S3-S6, informațiile sunt curate manual din surse
         oficiale și re-verificate periodic; data ultimei verificări e afișată pe
         fiecare pagină de sector.
       </p>

@@ -72,3 +72,22 @@ export function useStructuredData(data: unknown) {
     };
   }, [data]);
 }
+
+/**
+ * Like useStructuredData, but tolerates data that isn't available yet (null)
+ * and uses the serialized JSON as effect dependency, so async-loaded data
+ * doesn't re-inject on every render.
+ */
+export function useOptionalStructuredData(data: unknown | null) {
+  const json = data ? JSON.stringify(data) : null;
+  useEffect(() => {
+    if (!json) return;
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = json;
+    document.head.appendChild(script);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [json]);
+}

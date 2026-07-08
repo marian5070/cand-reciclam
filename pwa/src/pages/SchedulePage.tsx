@@ -10,8 +10,9 @@ import { LegalFooter } from '../components/LegalFooter.js';
 import { Link, navigate } from '../lib/router.js';
 import { ArrowLeft, Book } from 'lucide-react';
 import { getSchedule, getStreet, type ApiSchedule } from '../lib/api.js';
+import { WASTE_LABEL } from '../lib/types.js';
 import type { Address, Pickup, WasteType, SourceQuality } from '../lib/types.js';
-import { usePageMeta, useStructuredData } from '../lib/meta.js';
+import { usePageMeta, useStructuredData, useOptionalStructuredData } from '../lib/meta.js';
 import { getSector, FACTUAL_AS_OF } from '../lib/sectors.js';
 
 type LoadState =
@@ -89,6 +90,14 @@ export function SchedulePage({
     },
     dateModified: FACTUAL_AS_OF,
   });
+
+  // Recurring collection events from the operator's real RRULE data (only
+  // once the schedule is loaded; nothing emitted for aggregated/manual data).
+  useOptionalStructuredData(
+    load.status === 'ok'
+      ? buildScheduleJsonLd(load.rawSchedules, activeAddress, activeAddress.buildingType)
+      : null,
+  );
 
   useEffect(() => {
     if (!activeAddress.streetId) {
@@ -275,6 +284,94 @@ function expandSchedule(
     });
   }
   return out;
+}
+
+const SCHEMA_DAY: Record<string, string> = {
+  MO: 'https://schema.org/Monday',
+  TU: 'https://schema.org/Tuesday',
+  WE: 'https://schema.org/Wednesday',
+  TH: 'https://schema.org/Thursday',
+  FR: 'https://schema.org/Friday',
+  SA: 'https://schema.org/Saturday',
+  SU: 'https://schema.org/Sunday',
+};
+
+/**
+ * RRULE → schema.org Schedule. Returns null for anything we can't represent
+ * faithfully (e.g. nth-weekday BYDAY like "1MO") — those schedules simply
+ * don't emit JSON-LD rather than emitting something wrong.
+ */
+function rruleToSchemaSchedule(rrule: string): Record<string, unknown> | null {
+  const parts = Object.fromEntries(
+    rrule.split(';').map((p) => p.split('=') as [string, string]),
+  );
+  const interval = Number(parts.INTERVAL ?? '1');
+  if (!Number.isFinite(interval) || interval < 1) return null;
+  let repeatFrequency: string;
+  if (parts.FREQ === 'WEEKLY') repeatFrequency = `P${interval}W`;
+  else if (parts.FREQ === 'DAILY') repeatFrequency = `P${interval}D`;
+  else if (parts.FREQ === 'MONTHLY') repeatFrequency = `P${interval}M`;
+  else return null;
+  let byDay: string[] | undefined;
+  if (parts.BYDAY) {
+    const tokens = parts.BYDAY.split(',');
+    const mapped = tokens
+      .map((d) => SCHEMA_DAY[d])
+      .filter((d): d is string => Boolean(d));
+    if (mapped.length !== tokens.length) return null;
+    byDay = mapped;
+  }
+  return {
+    '@type': 'Schedule',
+    repeatFrequency,
+    ...(byDay && byDay.length ? { byDay } : {}),
+    scheduleTimezone: 'Europe/Bucharest',
+  };
+}
+
+/**
+ * Schema.org Event per waste type, built from the operator's real recurrence
+ * rules (same filtering as buildPickups). Aggregated/manual entries whose
+ * rrule can't be represented are skipped — no decorative data.
+ */
+function buildScheduleJsonLd(
+  schedules: ApiSchedule[],
+  addr: Address,
+  filter?: 'case' | 'blocuri',
+): unknown | null {
+  const relevant = filter
+    ? schedules.filter((s) => s.buildingType === filter || s.buildingType == null)
+    : schedules;
+  const seen = new Set<string>();
+  const events: Record<string, unknown>[] = [];
+  for (const s of relevant) {
+    if (!s.rrule) continue;
+    const key = `${s.wasteType}|${s.rrule}`;
+    if (seen.has(key)) continue;
+    const eventSchedule = rruleToSchemaSchedule(s.rrule);
+    if (!eventSchedule) continue;
+    seen.add(key);
+    events.push({
+      '@type': 'Event',
+      name: `Colectare ${WASTE_LABEL[s.wasteType] ?? s.wasteType} — ${addr.street} nr. ${addr.number}, Sector ${addr.sector}, București`,
+      eventSchedule,
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      location: {
+        '@type': 'Place',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: `${addr.street} nr. ${addr.number}`,
+          addressLocality: 'București',
+          addressRegion: `Sector ${addr.sector}`,
+          addressCountry: 'RO',
+        },
+      },
+      ...(s.operator ? { organizer: { '@type': 'Organization', name: s.operator } } : {}),
+      ...(s.sourceUrl ? { isBasedOn: s.sourceUrl } : {}),
+    });
+  }
+  if (!events.length) return null;
+  return { '@context': 'https://schema.org', '@graph': events };
 }
 
 function buildPickups(schedules: ApiSchedule[], filter?: 'case' | 'blocuri'): Pickup[] {

@@ -1,7 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link } from '../lib/router.js';
 import { LegalFooter } from '../components/LegalFooter.js';
-import { usePageMeta } from '../lib/meta.js';
+import { usePageMeta, useStructuredData } from '../lib/meta.js';
 import { FACTUAL_AS_OF } from '../lib/sectors.js';
 
 function formatDate(iso: string): string {
@@ -39,6 +39,22 @@ export function AboutPage() {
     description:
       'Despre „Când reciclăm?": ce face, ce nu face, cum colectăm datele, ce e public și ce nu. Cod open-source.',
     canonical: 'https://cand-reciclam.madeinro.eu/despre',
+  });
+  useStructuredData({
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'Despre proiect — Când reciclăm?',
+    url: 'https://cand-reciclam.madeinro.eu/despre',
+    inLanguage: 'ro',
+    description:
+      'Ce face și ce nu face „Când reciclăm?", cum colectăm datele oficiale despre colectarea deșeurilor în București și cum poți contribui.',
+    dateModified: FACTUAL_AS_OF,
+    author: { '@type': 'Person', name: 'Marian Matinca', url: 'https://mmatinca.eu' },
+    about: {
+      '@type': 'WebSite',
+      name: 'Când reciclăm?',
+      url: 'https://cand-reciclam.madeinro.eu/',
+    },
   });
   return (
     <PageShell title="Despre proiect">

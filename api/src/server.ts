@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import path from 'path';
+import { existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
@@ -55,6 +56,16 @@ if (isProduction) {
   app.setNotFoundHandler((req, reply) => {
     if (req.url.startsWith('/api/')) {
       return reply.code(404).send({ error: 'not found' });
+    }
+    // Serve the prerendered page when one exists for this route (e.g.
+    // /despre → dist/despre/index.html) so crawlers get real HTML; anything
+    // else falls back to the SPA shell exactly as before.
+    const route = (req.url.split('?')[0] ?? '').replace(/\/+$/, '');
+    if (/^\/[a-z0-9/-]+$/.test(route)) {
+      const candidate = path.join(pwaDist, route.slice(1), 'index.html');
+      if (candidate.startsWith(pwaDist) && existsSync(candidate)) {
+        return reply.sendFile(`${route.slice(1)}/index.html`);
+      }
     }
     return reply.sendFile('index.html');
   });

@@ -27,7 +27,14 @@ await app.register(cors, {
 });
 
 // RFC 8288 agent-discovery link on every response (additive; nothing else sets Link)
+// + security baseline (securityheaders.com); CSP separat, per-app.
+// HSTS fără includeSubDomains: alte subdomenii madeinro.eu sunt alt origin.
 app.addHook('onSend', async (_req, reply, payload) => {
+  reply.header('Strict-Transport-Security', 'max-age=31536000');
+  reply.header('X-Content-Type-Options', 'nosniff');
+  reply.header('X-Frame-Options', 'DENY');
+  reply.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   reply.header('Link', '</sitemap.xml>; rel="sitemap"');
   return payload;
 });

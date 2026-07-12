@@ -237,3 +237,4 @@ body {
   color: var(--color-fg);
   font-weight: 600;
 }
+:root { --cf-cache-bust: 20260712; }

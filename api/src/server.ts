@@ -102,6 +102,13 @@ if (isProduction) {
     if (req.url.startsWith('/api/')) {
       return reply.code(404).send({ error: 'not found' });
     }
+    // A hashed asset that misses on disk (e.g. mid-deploy, between the old
+    // process and a fresh Vite build) must NEVER be cached at the CDN edge:
+    // the HTML fallback under an /assets/ URL poisons that URL until TTL.
+    if (req.url.startsWith('/assets/')) {
+      reply.header('Cache-Control', 'no-store');
+      return reply.code(404).send({ error: 'asset not found' });
+    }
     // Serve the prerendered page when one exists for this route (e.g.
     // /despre → dist/despre/index.html) so crawlers get real HTML; anything
     // else falls back to the SPA shell exactly as before.

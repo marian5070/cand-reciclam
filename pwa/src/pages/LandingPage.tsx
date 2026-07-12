@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, MapPin, ArrowRight, Loader2, Info } from 'lucide-react';
 import { ALL_SECTORS, STATUS_META, type SectorInfo } from '../lib/sectors.js';
-import { searchStreets, type StreetSearchResult } from '../lib/api.js';
+import { getSchedule, searchStreets, type StreetSearchResult } from '../lib/api.js';
 import { Link, navigate } from '../lib/router.js';
 import { LegalFooter } from '../components/LegalFooter.js';
 import { usePageMeta, useStructuredData } from '../lib/meta.js';
+import { WASTE_LABEL, type WasteType } from '../lib/types.js';
+import { wasteTint } from '../components/WasteIcon.js';
+import { proximityLabel } from '../lib/time.js';
 
 export function LandingPage() {
   usePageMeta({
@@ -41,28 +44,38 @@ export function LandingPage() {
         <div className="grain absolute inset-0 pointer-events-none" aria-hidden />
 
         <div className="relative z-10 mx-auto max-w-4xl px-6 pt-16 md:pt-24 pb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.02]">
-              Când reciclăm?
-            </h1>
-            <p className="mt-4 text-lg md:text-xl text-[color:var(--color-muted)] leading-relaxed max-w-2xl">
-              Programul colectării deșeurilor per adresă în București — cu sursele
-              oficiale pentru fiecare afirmație.
-            </p>
-          </motion.div>
+          <div className="grid gap-10 lg:grid-cols-[1fr_minmax(300px,360px)] lg:items-start">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-[1.02]">
+                  Când reciclăm?
+                </h1>
+                <p className="mt-4 text-lg md:text-xl text-[color:var(--color-muted)] leading-relaxed max-w-2xl">
+                  Programul colectării deșeurilor per adresă în București — cu sursele
+                  oficiale pentru fiecare afirmație.
+                </p>
+                <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/90 px-3.5 py-1.5 text-sm text-[color:var(--color-muted)]">
+                  <span className="size-1.5 rounded-full bg-[color:var(--color-accent)]" aria-hidden />
+                  Gratuit · Fără cont · Funcționează offline
+                </p>
+              </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="mt-10 md:mt-14"
-          >
-            <StreetSearch />
-          </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.15 }}
+                className="mt-10 md:mt-12"
+              >
+                <StreetSearch />
+              </motion.div>
+            </div>
+
+            <ExamplePreview />
+          </div>
 
           <motion.section
             initial={{ opacity: 0, y: 12 }}
@@ -115,6 +128,144 @@ export function LandingPage() {
       </main>
       <LegalFooter />
     </>
+  );
+}
+
+// The result-preview card: one REAL address with its REAL published schedule,
+// fetched live from our own API so it always matches what search would show.
+// If the API has nothing for it, the card simply doesn't render — no theater.
+const EXAMPLE = {
+  streetId: 600,
+  number: 100,
+  sector: 1,
+  street: 'Ion Mihalache',
+  to: '/adresa/600/100?sector=1',
+};
+const RRULE_DAY: Record<string, number> = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+const DAY_LC = ['duminică', 'luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmbătă'];
+
+function ExamplePreview() {
+  const [rows, setRows] = useState<{ wasteType: WasteType; days: number[] }[]>([]);
+  const [next, setNext] = useState<{ iso: string; wasteType: WasteType } | null>(null);
+  const [operator, setOperator] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    getSchedule(EXAMPLE.streetId, EXAMPLE.number)
+      .then((schedules) => {
+        if (!alive || schedules.length === 0) return;
+        const byType = new Map<WasteType, Set<number>>();
+        for (const s of schedules) {
+          const m = /BYDAY=([A-Z,]+)/.exec(s.rrule ?? '');
+          if (!m) continue;
+          const days = m[1]!
+            .split(',')
+            .map((d) => RRULE_DAY[d])
+            .filter((d): d is number => d !== undefined);
+          if (days.length === 0) continue;
+          if (!byType.has(s.wasteType)) byType.set(s.wasteType, new Set());
+          for (const d of days) byType.get(s.wasteType)!.add(d);
+        }
+        if (byType.size === 0) return;
+        const parsed = [...byType.entries()].map(([wasteType, ds]) => ({
+          wasteType,
+          days: [...ds].sort((a, b) => a - b),
+        }));
+        // Next pickup across all fractions, same day-walking logic as the
+        // schedule page (07:00 local, today included).
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        outer: for (let i = 0; i < 8; i++) {
+          const d = new Date(today);
+          d.setDate(d.getDate() + i);
+          for (const r of parsed) {
+            if (r.days.includes(d.getDay())) {
+              d.setHours(7, 0, 0, 0);
+              setNext({ iso: d.toISOString(), wasteType: r.wasteType });
+              break outer;
+            }
+          }
+        }
+        setOperator(schedules[0]?.operator ?? null);
+        setRows(parsed);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (rows.length === 0) return null;
+  const prox = next ? proximityLabel(next.iso) : null;
+
+  return (
+    <motion.aside
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay: 0.35 }}
+      aria-label="Exemplu de rezultat"
+    >
+      <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--color-muted)] font-semibold mb-2">
+        Exemplu real — ce primești
+      </div>
+      <Link
+        to={EXAMPLE.to}
+        className="group block rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 transition hover:border-[color:var(--color-accent)] hover:shadow-[0_8px_24px_-12px_oklch(20%_0.04_160/0.25)]"
+      >
+        <div className="flex items-center gap-2 text-[15px] font-medium">
+          <MapPin size={15} className="text-[color:var(--color-accent)] shrink-0" aria-hidden />
+          <span className="truncate">{EXAMPLE.street}</span>
+          <span className="font-mono tabular-nums text-[color:var(--color-accent-strong)]">
+            nr. {EXAMPLE.number}
+          </span>
+          <span className="text-sm text-[color:var(--color-muted)]">· S{EXAMPLE.sector}</span>
+        </div>
+
+        {prox && next && (
+          <div className="mt-4 rounded-2xl bg-[color:var(--color-fg)]/[0.04] px-4 py-3">
+            <div className="text-xs uppercase tracking-wider text-[color:var(--color-muted)] font-semibold">
+              Următoarea colectare
+            </div>
+            <div className="mt-0.5 text-lg font-semibold leading-tight">
+              {prox.label}
+              <span className="text-[color:var(--color-muted)] font-normal">
+                {' '}
+                · {WASTE_LABEL[next.wasteType].toLowerCase()}
+              </span>
+            </div>
+          </div>
+        )}
+
+        <ul className="mt-4 space-y-2.5">
+          {rows.map((r) => (
+            <li key={r.wasteType} className="flex items-start gap-2.5 text-sm">
+              <span
+                className="mt-1.5 size-2.5 shrink-0 rounded-full"
+                style={{ background: wasteTint(r.wasteType) }}
+                aria-hidden
+              />
+              <span>
+                <span className="font-medium">{WASTE_LABEL[r.wasteType]}</span>
+                <span className="text-[color:var(--color-muted)]">
+                  {' — '}
+                  {r.days.map((d) => DAY_LC[d]).join(', ')}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[color:var(--color-border)] pt-3 text-sm">
+          <span className="text-[color:var(--color-muted)]">
+            Sursă: {operator ?? 'operator'} — program oficial per stradă și număr
+          </span>
+          <span className="inline-flex shrink-0 items-center gap-1 text-[color:var(--color-accent)] font-medium group-hover:text-[color:var(--color-accent-strong)]">
+            Vezi adresa
+            <ArrowRight size={13} aria-hidden />
+          </span>
+        </div>
+      </Link>
+    </motion.aside>
   );
 }
 

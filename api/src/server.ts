@@ -26,6 +26,23 @@ await app.register(cors, {
   credentials: true,
 });
 
+// CSP Etapa 2 — Report-Only întâi. Singura resursă externă reală: tile-urile
+// OpenStreetMap (hărțile din pagini). SPA-ul Vite nu are scripturi inline,
+// deci script-src rămâne strict 'self'. Încălcările ajung la /csp-report.
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: https://tile.openstreetmap.org https://*.tile.openstreetmap.org",
+  "font-src 'self'",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  'report-uri /csp-report',
+].join('; ');
+
 // RFC 8288 agent-discovery link on every response (additive; nothing else sets Link)
 // + security baseline (securityheaders.com); CSP separat, per-app.
 // HSTS fără includeSubDomains: alte subdomenii madeinro.eu sunt alt origin.
@@ -35,8 +52,29 @@ app.addHook('onSend', async (_req, reply, payload) => {
   reply.header('X-Frame-Options', 'DENY');
   reply.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  reply.header('Content-Security-Policy-Report-Only', CSP_REPORT_ONLY);
   reply.header('Link', '</sitemap.xml>; rel="sitemap"');
   return payload;
+});
+
+// Colectorul de rapoarte CSP: browserele trimit application/csp-report —
+// Fastify are nevoie de parser dedicat pentru acest content-type.
+app.addContentTypeParser(
+  'application/csp-report',
+  { parseAs: 'string', bodyLimit: 16384 },
+  (_req, body, done) => {
+    try {
+      done(null, JSON.parse(body as string));
+    } catch {
+      done(null, {});
+    }
+  },
+);
+app.post('/csp-report', async (req, reply) => {
+  const body = (req.body as Record<string, unknown> | null) ?? {};
+  const report = (body['csp-report'] as unknown) ?? body;
+  app.log.warn({ cspReport: report }, 'csp-report');
+  return reply.status(204).send();
 });
 
 app.get('/api/health', async () => {

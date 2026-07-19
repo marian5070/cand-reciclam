@@ -29,7 +29,8 @@ await app.register(cors, {
 // CSP Etapa 2 — Report-Only întâi. Singura resursă externă reală: tile-urile
 // OpenStreetMap (hărțile din pagini). SPA-ul Vite nu are scripturi inline,
 // deci script-src rămâne strict 'self'. Încălcările ajung la /csp-report.
-const CSP_REPORT_ONLY = [
+// Enforce din 19 iul 2026 — soak Report-Only 12–19 iul: zero rapoarte.
+const CSP_POLICY = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
@@ -52,7 +53,7 @@ app.addHook('onSend', async (_req, reply, payload) => {
   reply.header('X-Frame-Options', 'DENY');
   reply.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  reply.header('Content-Security-Policy-Report-Only', CSP_REPORT_ONLY);
+  reply.header('Content-Security-Policy', CSP_POLICY);
   reply.header('Link', '</sitemap.xml>; rel="sitemap"');
   return payload;
 });

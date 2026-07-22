@@ -51,6 +51,12 @@ export function LegalFooter() {
             <a href="/confidentialitate" className="text-[color:var(--color-muted)] hover:text-[color:var(--color-fg)] transition">
               Confidențialitate
             </a>
+            <a href="/contact" className="text-[color:var(--color-muted)] hover:text-[color:var(--color-fg)] transition">
+              Contact
+            </a>
+            <a href="/chatgpt" className="text-[color:var(--color-muted)] hover:text-[color:var(--color-fg)] transition">
+              Plugin ChatGPT
+            </a>
           </nav>
         </section>
 

@@ -11,7 +11,7 @@ function formatDate(iso: string): string {
   return `${d} ${months[m - 1]} ${y}`;
 }
 
-function PageShell({ title, children }: { title: string; children: React.ReactNode }) {
+export function PageShell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <>
       <main className="min-h-dvh">
@@ -308,6 +308,48 @@ export function PrivacyPage() {
       <p>
         Orice modificare a acestei politici va fi reflectată aici cu noua dată de
         actualizare.
+      </p>
+    </PageShell>
+  );
+}
+
+export function ContactPage() {
+  usePageMeta({
+    title: 'Contact & suport',
+    description:
+      'Contact și suport pentru „Când reciclăm?" — corecții de date, întrebări despre site sau despre aplicația pentru asistenți AI (MCP).',
+    canonical: 'https://cand-reciclam.madeinro.eu/contact',
+  });
+  return (
+    <PageShell title="Contact & suport">
+      <h2>Operator</h2>
+      <p>
+        „Când reciclăm?" (cand-reciclam.madeinro.eu) este operat de{' '}
+        <strong>Marian Matinca</strong>, România. Operated by Marian Matinca,
+        Romania — we reply in Romanian or English.
+      </p>
+
+      <h2>Suport</h2>
+      <p>
+        Pentru orice întrebare despre site, despre date sau despre aplicația pentru
+        asistenți AI (endpoint MCP), scrie la:
+      </p>
+      <p>
+        <a href="mailto:marian@mmatinca.eu">
+          <strong>marian@mmatinca.eu</strong>
+        </a>
+      </p>
+      <p>
+        Răspundem de regulă în 2 zile lucrătoare. <strong>Corecțiile de date au
+        prioritate</strong> — dacă programul afișat nu corespunde cu ce publică
+        operatorul tău, include strada, numărul și sectorul.
+      </p>
+
+      <h2>Pentru dezvoltatori & agenți AI</h2>
+      <p>
+        Discovery MCP:{' '}
+        <a href="/.well-known/mcp.json">/.well-known/mcp.json</a> · metodologia și
+        sursele: <a href="/despre">/despre</a>.
       </p>
     </PageShell>
   );

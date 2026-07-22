@@ -15,9 +15,14 @@ Sitemap: https://cand-reciclam.madeinro.eu/sitemap.xml
 
 Detaliile complete, cu link către sursa oficială a fiecărui sector: https://cand-reciclam.madeinro.eu/despre
 
+## Plugin ChatGPT
+
+Din 21 iulie 2026, „Când reciclăm?" este plugin în directorul oficial ChatGPT — evaluat și aprobat de OpenAI (v1.0.0). Utilizatorii pot întreba direct în conversație („@Când Reciclăm Când se ridică gunoiul pe Strada Aviatorilor 20?"). Pagina pluginului: https://chatgpt.com/plugins/plugin_asdk_app_6a5a1e1c646881919ea3a47685739b06 · Detalii: https://cand-reciclam.madeinro.eu/chatgpt
+
 ## Pagini
 
 - [Acasă / căutare adresă](https://cand-reciclam.madeinro.eu/): caută strada ta și vezi programul de colectare
+- [Plugin ChatGPT](https://cand-reciclam.madeinro.eu/chatgpt): anunțul publicării în ChatGPT, ce poți întreba, cum îl instalezi
 - [Despre](https://cand-reciclam.madeinro.eu/despre): metodologie, surse oficiale per sector, limitele datelor
 - [Confidențialitate](https://cand-reciclam.madeinro.eu/confidentialitate): politica de confidențialitate
 

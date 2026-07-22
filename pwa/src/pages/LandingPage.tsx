@@ -8,6 +8,7 @@ import { LegalFooter } from '../components/LegalFooter.js';
 import { usePageMeta, useStructuredData } from '../lib/meta.js';
 import { WASTE_LABEL, type WasteType } from '../lib/types.js';
 import { wasteTint } from '../components/WasteIcon.js';
+import { OpenAILogo } from '../components/OpenAILogo.js';
 import { proximityLabel } from '../lib/time.js';
 
 export function LandingPage() {
@@ -61,6 +62,23 @@ export function LandingPage() {
                 <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface)]/90 px-3.5 py-1.5 text-sm text-[color:var(--color-muted)]">
                   <span className="size-1.5 rounded-full bg-[color:var(--color-accent)]" aria-hidden />
                   Gratuit · Fără cont · Funcționează offline
+                </p>
+                <p className="mt-3 flex flex-wrap items-center gap-2.5">
+                  <a
+                    href="https://chatgpt.com/plugins/plugin_asdk_app_6a5a1e1c646881919ea3a47685739b06"
+                    target="_blank"
+                    rel="nofollow noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-accent)]/50 bg-[color:var(--color-surface-tinted)] px-4 py-2 text-sm font-semibold text-[color:var(--color-fg)] hover:border-[color:var(--color-accent)] transition"
+                  >
+                    <OpenAILogo className="w-5 h-5 shrink-0 text-[color:var(--color-accent)]" />
+                    Evaluat și aprobat de OpenAI — încearcă în ChatGPT acum
+                  </a>
+                  <Link
+                    to="/chatgpt"
+                    className="text-sm text-[color:var(--color-muted)] underline underline-offset-2 hover:text-[color:var(--color-fg)] transition"
+                  >
+                    detalii
+                  </Link>
                 </p>
               </motion.div>
 

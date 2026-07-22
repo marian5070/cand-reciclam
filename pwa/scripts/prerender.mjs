@@ -31,6 +31,8 @@ const ROUTES = [
   '/despre',
   '/termeni',
   '/confidentialitate',
+  '/contact',
+  '/chatgpt',
 ];
 
 const MIME = {

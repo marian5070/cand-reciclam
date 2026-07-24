@@ -105,13 +105,25 @@ export function LegalFooter() {
               <li>
                 <a href="https://tv.madeinro.eu" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
                   Ghid TV, cinema streaming și teatru
-                  <span className="block text-xs text-[color:var(--color-subtle)]">tv.madeinro.eu</span>
+                  <span className="block text-xs text-[color:var(--color-subtle)]">tv.madeinro.eu · în curând în ChatGPT</span>
                 </a>
               </li>
               <li>
                 <a href="https://travel-trends.mmatinca.eu" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
                   EU travel trends 2015–2026
-                  <span className="block text-xs text-[color:var(--color-subtle)]">travel-trends.mmatinca.eu</span>
+                  <span className="block text-xs text-[color:var(--color-subtle)]">travel-trends.mmatinca.eu · în curând în ChatGPT</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://compass.madeinro.eu" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
+                  Digital Compass — ghid de siguranță digitală
+                  <span className="block text-xs text-[color:var(--color-subtle)]">compass.madeinro.eu · în curând în ChatGPT</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://euaicomply.eu" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
+                  EU AI Comply — conformitate EU AI Act
+                  <span className="block text-xs text-[color:var(--color-subtle)]">euaicomply.eu</span>
                 </a>
               </li>
             </ul>

@@ -24,6 +24,16 @@ Din 21 iulie 2026, „Când reciclăm?" este plugin în directorul oficial ChatG
 - [Acasă / căutare adresă](https://cand-reciclam.madeinro.eu/): caută strada ta și vezi programul de colectare
 - [Plugin ChatGPT](https://cand-reciclam.madeinro.eu/chatgpt): anunțul publicării în ChatGPT, ce poți întreba, cum îl instalezi
 - [Cum funcționează](https://cand-reciclam.madeinro.eu/cum-functioneaza): drumul datelor de la sursele oficiale la răspuns (site, PWA, ChatGPT — aceeași sursă de adevăr) + link către studiul de caz complet pe mmatinca.eu
+
+## Same ecosystem
+
+Sites by the same author (Marian Matinca):
+- https://mmatinca.eu — portfolio, case studies and blog
+- https://avizo.ro — compliance alerts for Romanian firms
+- https://euaicomply.eu — EU AI Act compliance platform
+- https://tv.madeinro.eu — Romanian TV & entertainment guide (soon in ChatGPT)
+- https://travel-trends.mmatinca.eu — European travel-intelligence radar (soon in ChatGPT)
+- https://compass.madeinro.eu — digital-safety guide in 9 languages (soon in ChatGPT)
 - [Despre](https://cand-reciclam.madeinro.eu/despre): metodologie, surse oficiale per sector, limitele datelor
 - [Confidențialitate](https://cand-reciclam.madeinro.eu/confidentialitate): politica de confidențialitate
 

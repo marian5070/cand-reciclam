@@ -33,6 +33,7 @@ const ROUTES = [
   '/confidentialitate',
   '/contact',
   '/chatgpt',
+  '/cum-functioneaza',
 ];
 
 const MIME = {

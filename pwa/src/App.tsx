@@ -5,6 +5,7 @@ import { SectorPage } from './pages/SectorPage.js';
 import { SchedulePage } from './pages/SchedulePage.js';
 import { AboutPage, TermsPage, PrivacyPage, ContactPage } from './pages/StaticPages.js';
 import { ChatGPTPage } from './pages/ChatGPTPage.js';
+import { CumFunctioneazaPage } from './pages/CumFunctioneazaPage.js';
 import { ThemeToggle } from './components/ThemeToggle.js';
 import { HelpToggle } from './components/HelpToggle.js';
 import { Tour, type TourStep } from './components/Tour.js';
@@ -73,6 +74,7 @@ export function App() {
     { path: '/confidentialitate', render: () => <PrivacyPage /> },
     { path: '/contact', render: () => <ContactPage /> },
     { path: '/chatgpt', render: () => <ChatGPTPage /> },
+    { path: '/cum-functioneaza', render: () => <CumFunctioneazaPage /> },
   ];
 
   const showTourButton = pathname.startsWith('/adresa/');

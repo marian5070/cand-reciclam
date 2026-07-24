@@ -57,6 +57,14 @@ export function LegalFooter() {
             <a href="/chatgpt" className="text-[color:var(--color-muted)] hover:text-[color:var(--color-fg)] transition">
               Plugin ChatGPT
             </a>
+            <a
+              href="https://chatgpt.com/plugins/plugin_asdk_app_6a5a1e1c646881919ea3a47685739b06"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[color:var(--color-accent)] hover:text-[color:var(--color-fg)] transition"
+            >
+              Acum în ChatGPT ↗
+            </a>
             <a href="/cum-functioneaza" className="text-[color:var(--color-muted)] hover:text-[color:var(--color-fg)] transition">
               Cum funcționează
             </a>

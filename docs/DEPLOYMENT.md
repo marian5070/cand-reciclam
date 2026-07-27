@@ -2,6 +2,19 @@
 
 Producție: VPS Hetzner (Helsinki), expus public prin **Cloudflare Tunnels**. Fără porturi inbound deschise pe server.
 
+> **Realitatea curentă (27 iul 2026)** — secțiunile istorice de mai jos au fost scrise
+> înainte de primul deploy și diferă de producția reală:
+> - Cod: **`/opt/apps/cand-reciclam`** (NU `/srv/cand-reciclam`), user `marian` (NU `deploy`).
+> - Process manager: **pm2** (NU systemd) — procese: `cand-reciclam` (API+static, :3030)
+>   și `cand-reciclam-mcp` (:3080, config `mcp/ecosystem.config.cjs`; directorul `mcp/`
+>   NU e în git — conține tokenul OpenAI, iar repo-ul e public).
+> - cloudflared: config în `/etc/cloudflared/config.yml`; după editare
+>   **`sudo systemctl restart cloudflared`** — NU `reload` (SIGHUP oprește procesul
+>   fără auto-restart).
+> - Update-ul curent: `git pull` → `(cd api && npm run build)` → `(cd pwa && npm run build)`
+>   → **`pm2 restart cand-reciclam`**. Restartul e OBLIGATORIU după orice build pwa:
+>   @fastify/static cu `wildcard:false` face glob-ul rutelor o singură dată, la boot.
+
 ## Arhitectură producție
 
 ```

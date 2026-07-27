@@ -40,4 +40,4 @@ Sites by the same author (Marian Matinca):
 ## Note pentru agenți
 
 - Site-ul afișează doar date preluate din surse oficiale ale operatorilor de salubritate; unde nu există date publicate, spune explicit asta în loc să inventeze.
-- API-ul intern (/api/) nu e documentat public; folosește paginile HTML.
+- API-ul public read-only e documentat la https://cand-reciclam.madeinro.eu/openapi.json (catalog RFC 9727: /.well-known/api-catalog; ghid de acces: /auth.md; index agent-skills: /.well-known/agent-skills/index.json).

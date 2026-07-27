@@ -1,0 +1,65 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Când Reciclăm Public API",
+    "version": "1.0.0",
+    "description": "Read-only public API for Bucharest waste-collection schedules, built exclusively from official operator sources. Every schedule row carries sourceUrl + sourceQuality; where no public data exists, the API says so instead of inventing schedules. No auth, no registration — see /auth.md.",
+    "contact": { "url": "https://cand-reciclam.madeinro.eu/despre" }
+  },
+  "servers": [{ "url": "https://cand-reciclam.madeinro.eu" }],
+  "paths": {
+    "/api/streets": {
+      "get": {
+        "operationId": "searchStreets",
+        "summary": "Street autocomplete (min 2 chars, max 20 results)",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string", "minLength": 2 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching streets: id, name, slug, sectors[], numberRange, segmentCount",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/streets/{id}": {
+      "get": {
+        "operationId": "getStreet",
+        "summary": "Single street detail",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Street: name, slug, sectors, number range", "content": { "application/json": { "schema": { "type": "object" } } } },
+          "404": { "description": "Unknown street" }
+        }
+      }
+    },
+    "/api/schedule": {
+      "get": {
+        "operationId": "getSchedule",
+        "summary": "Collection schedules for a street (optional house number with odd/even parity matching)",
+        "parameters": [
+          { "name": "street_id", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "number", "in": "query", "required": false, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Schedule rows: wasteType, rrule (RFC 5545), overrideDates (take precedence over the rrule), buildingType, operator, sectorId, zone, sourceQuality, sourceUrl (official source attribution — preserve when relaying)",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health",
+        "summary": "Liveness (checks the database too)",
+        "responses": {
+          "200": { "description": "{ status, brand, db, time }", "content": { "application/json": { "schema": { "type": "object" } } } }
+        }
+      }
+    }
+  }
+}

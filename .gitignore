@@ -20,3 +20,8 @@ scripts/spike-*/raw/
 
 # Backups
 .git.backup-*/
+
+# never in the public repo: OpenAI apps token lives in mcp/ecosystem.config.cjs
+mcp/
+# 31MB demo video, runtime-only asset
+pwa/public/demo-chatgpt.mp4

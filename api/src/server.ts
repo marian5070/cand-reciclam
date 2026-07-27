@@ -54,7 +54,14 @@ app.addHook('onSend', async (_req, reply, payload) => {
   reply.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   reply.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   reply.header('Content-Security-Policy', CSP_POLICY);
-  reply.header('Link', '</sitemap.xml>; rel="sitemap"');
+  // Fastify overwrites (not appends) on a second header('Link', …) call, so
+  // every rel lives in this single comma-separated value.
+  reply.header(
+    'Link',
+    '</sitemap.xml>; rel="sitemap", ' +
+      '</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json", ' +
+      '</openapi.json>; rel="service-desc"; type="application/json"',
+  );
   return payload;
 });
 
@@ -88,6 +95,30 @@ app.get('/api/health', async () => {
   };
 });
 
+// RFC 9727 api-catalog: linkset of this origin's machine-readable APIs.
+// Explicit route (not a static file): the path has no extension, so the
+// linkset+json content type must be set by hand.
+app.get('/.well-known/api-catalog', async (_req, reply) => {
+  const base = 'https://cand-reciclam.madeinro.eu';
+  return reply
+    .header('Content-Type', 'application/linkset+json')
+    .header('Cache-Control', 'public, max-age=3600')
+    .send({
+      linkset: [
+        {
+          anchor: `${base}/api`,
+          'service-desc': [{ href: `${base}/openapi.json`, type: 'application/json' }],
+          'service-doc': [{ href: `${base}/llms.txt`, type: 'text/plain' }],
+          status: [{ href: `${base}/api/health`, type: 'application/json' }],
+        },
+        {
+          anchor: `${base}/mcp`,
+          'service-desc': [{ href: `${base}/.well-known/mcp.json`, type: 'application/json' }],
+        },
+      ],
+    });
+});
+
 await app.register(streetsRoutes);
 await app.register(usersRoutes);
 await app.register(geocodeRoutes);
@@ -98,6 +129,9 @@ if (isProduction) {
     root: pwaDist,
     prefix: '/',
     wildcard: false,
+    // Without this, the boot-time glob skips every dotted path and nothing
+    // under dist/.well-known/ ever gets a route (agent-skills index etc.).
+    serveDotFiles: true,
   });
   app.setNotFoundHandler((req, reply) => {
     if (req.url.startsWith('/api/')) {
@@ -109,6 +143,13 @@ if (isProduction) {
     if (req.url.startsWith('/assets/')) {
       reply.header('Cache-Control', 'no-store');
       return reply.code(404).send({ error: 'asset not found' });
+    }
+    // Discovery paths must never 200 with the SPA shell: agents probing
+    // /.well-known/* would get text/html where they expect JSON — worse
+    // than an honest 404.
+    if (req.url.startsWith('/.well-known/')) {
+      reply.header('Cache-Control', 'no-store');
+      return reply.code(404).send({ error: 'not found' });
     }
     // Serve the prerendered page when one exists for this route (e.g.
     // /despre → dist/despre/index.html) so crawlers get real HTML; anything

@@ -1,7 +1,9 @@
 // Service Worker — Când reciclăm?
 // Offline-first: cache shell, stale-while-revalidate for API, cache-first for fonts/icons
 
-const VERSION = 'v1';
+// v2 (27 iul 2026): cache-first .js/.json ar fi pinuit /webmcp.js și
+// snapshot-urile /data/agents/* — bump obligatoriu la orice fișier static nou.
+const VERSION = 'v2';
 const SHELL_CACHE = `cr-shell-${VERSION}`;
 const API_CACHE = `cr-api-${VERSION}`;
 const STATIC_CACHE = `cr-static-${VERSION}`;

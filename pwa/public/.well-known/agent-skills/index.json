@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "query-cand-reciclam",
+      "type": "skill-md",
+      "description": "Query Când Reciclăm (cand-reciclam.madeinro.eu) — Bucharest waste-collection schedules from official operator sources — via the public MCP server, the read-only JSON API or in-browser WebMCP tools.",
+      "url": "/.well-known/agent-skills/query-cand-reciclam/SKILL.md",
+      "digest": "sha256:1e1c6c830f14cea7e1d832adc8406b3de7631cb1532153f462db5c077d0daf04"
+    }
+  ]
+}

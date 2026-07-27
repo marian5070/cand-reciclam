@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import path from 'path';
 import { existsSync } from 'fs';
+import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
+import { load as cheerioLoad } from 'cheerio';
+import TurndownService from 'turndown';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import staticPlugin from '@fastify/static';
@@ -125,6 +128,37 @@ await app.register(geocodeRoutes);
 
 if (isProduction) {
   const pwaDist = path.resolve(__dirname, '../../pwa/dist');
+
+  // Markdown content negotiation: GET + Accept: text/markdown on a route
+  // that has prerendered HTML → the same content crawlers get, converted to
+  // markdown. Cached per route until restart — dist only changes with a
+  // build, and a build already requires a pm2 restart (wildcard:false glob).
+  const turndown = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
+  const mdCache = new Map<string, string>();
+  app.addHook('onRequest', async (req, reply) => {
+    if (req.method !== 'GET') return;
+    if (!(req.headers.accept ?? '').includes('text/markdown')) return;
+    const route = (req.url.split('?')[0] ?? '').replace(/\/+$/, '') || '/';
+    if (route.startsWith('/api/') || route === '/csp-report') return;
+    if (!/^\/[a-z0-9/-]*$/.test(route)) return;
+    let md = mdCache.get(route);
+    if (md === undefined) {
+      const rel = route === '/' ? 'index.html' : `${route.slice(1)}/index.html`;
+      const candidate = path.join(pwaDist, rel);
+      if (!candidate.startsWith(pwaDist) || !existsSync(candidate)) return;
+      const $ = cheerioLoad(await readFile(candidate, 'utf8'));
+      $('script, style, noscript, svg, iframe').remove();
+      const body = $('main').first().html() ?? $('body').html() ?? '';
+      md = turndown.turndown(body).trim();
+      if (!md) return; // never serve an empty document — fall through to HTML
+      mdCache.set(route, md);
+    }
+    return reply
+      .header('Content-Type', 'text/markdown; charset=utf-8')
+      .header('Vary', 'Accept')
+      .send(md);
+  });
+
   await app.register(staticPlugin, {
     root: pwaDist,
     prefix: '/',

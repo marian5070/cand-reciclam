@@ -113,7 +113,15 @@ export function LegalFooter() {
               <li>
                 <a href="https://tv.madeinro.eu" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
                   Ghid TV, cinema streaming și teatru
-                  <span className="block text-xs text-[color:var(--color-subtle)]">tv.madeinro.eu · în curând în ChatGPT</span>
+                  <span className="block text-xs text-[color:var(--color-subtle)]">tv.madeinro.eu</span>
+                </a>
+                <a
+                  href="https://chatgpt.com/plugins/plugin_asdk_app_6a57b70342308191a15130463f6a5995"
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="block text-xs text-[color:var(--color-accent)] hover:text-[color:var(--color-fg)] transition"
+                >
+                  acum în ChatGPT ↗
                 </a>
               </li>
               <li>
@@ -125,7 +133,15 @@ export function LegalFooter() {
               <li>
                 <a href="https://compass.madeinro.eu" target="_blank" rel="noopener noreferrer" className="text-[color:var(--color-fg)] hover:text-[color:var(--color-accent)] transition">
                   Digital Compass — ghid de siguranță digitală
-                  <span className="block text-xs text-[color:var(--color-subtle)]">compass.madeinro.eu · în curând în ChatGPT</span>
+                  <span className="block text-xs text-[color:var(--color-subtle)]">compass.madeinro.eu</span>
+                </a>
+                <a
+                  href="https://chatgpt.com/plugins/plugin_asdk_app_6a5a0b646b808191924d068d79d7c082"
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="block text-xs text-[color:var(--color-accent)] hover:text-[color:var(--color-fg)] transition"
+                >
+                  acum în ChatGPT ↗
                 </a>
               </li>
               <li>

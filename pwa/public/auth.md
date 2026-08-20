@@ -12,9 +12,11 @@ schedules, sector coverage information or waste-sorting guidance.
 ## Registration
 
 **None.** Everything is public and read-only. There is no sign-up, no API
-keys, no OAuth authorization server, and no protected resource — so no OAuth
-metadata is published; we only publish metadata for infrastructure that
-actually exists.
+keys and no OAuth authorization server. `/.well-known/oauth-protected-resource`
+(RFC 9728) is published and describes exactly that: a public resource with no
+credentials and deliberately **no** `authorization_servers` — we only publish
+metadata for infrastructure that actually exists. Do not attempt dynamic
+client registration; there is nothing to register.
 
 ## Supported access method
 

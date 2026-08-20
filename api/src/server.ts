@@ -122,6 +122,20 @@ app.get('/.well-known/api-catalog', async (_req, reply) => {
     });
 });
 
+// RFC 9728 Protected Resource Metadata — honest minimal form: public
+// resource, zero credentials, deliberately no authorization_servers.
+app.get('/.well-known/oauth-protected-resource', async (_req, reply) => {
+  return reply
+    .header('Content-Type', 'application/json')
+    .header('Access-Control-Allow-Origin', '*')
+    .header('Cache-Control', 'public, max-age=3600')
+    .send({
+      resource: 'https://cand-reciclam.madeinro.eu',
+      resource_documentation: 'https://cand-reciclam.madeinro.eu/auth.md',
+      resource_name: 'Când Reciclăm API',
+    });
+});
+
 // ARD (Agentic Resource Discovery) manifest, ai-catalog 1.0 data model.
 // Explicit route for the same reason as api-catalog above, plus the CORS *
 // header the ARD spec requires. Only artifacts this origin actually serves.

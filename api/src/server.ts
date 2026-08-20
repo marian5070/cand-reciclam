@@ -122,6 +122,93 @@ app.get('/.well-known/api-catalog', async (_req, reply) => {
     });
 });
 
+// ARD (Agentic Resource Discovery) manifest, ai-catalog 1.0 data model.
+// Explicit route for the same reason as api-catalog above, plus the CORS *
+// header the ARD spec requires. Only artifacts this origin actually serves.
+app.get('/.well-known/ai-catalog.json', async (_req, reply) => {
+  const base = 'https://cand-reciclam.madeinro.eu';
+  return reply
+    .header('Content-Type', 'application/json')
+    .header('Access-Control-Allow-Origin', '*')
+    .header('Cache-Control', 'public, max-age=3600')
+    .send({
+      specVersion: '1.0',
+      host: {
+        displayName: 'Când Reciclăm',
+        identifier: 'did:web:cand-reciclam.madeinro.eu',
+        documentationUrl: `${base}/despre`,
+      },
+      entries: [
+        {
+          identifier: 'urn:air:cand-reciclam.madeinro.eu:mcp:cand-reciclam',
+          displayName: 'cand-reciclam-mcp',
+          type: 'application/mcp-server-card+json',
+          url: `${base}/.well-known/mcp.json`,
+          description:
+            'Bucharest waste-collection MCP: real per-address collection schedules (Sector 1, partially Sector 2) with the official operator source linked per claim, per-sector transparency status, practical sorting guide.',
+          tags: ['mcp', 'recycling', 'bucharest', 'public-good'],
+          representativeQueries: [
+            'Când se ridică reciclabilele pe strada mea din Sectorul 1?',
+            'Where do I take used batteries in Bucharest?',
+            'What waste does each Bucharest sector operator actually publish?',
+          ],
+        },
+        {
+          identifier: 'urn:air:cand-reciclam.madeinro.eu:skill:query-cand-reciclam',
+          displayName: 'query-cand-reciclam skill',
+          type: 'application/agent-skills+md',
+          url: `${base}/.well-known/agent-skills/query-cand-reciclam/SKILL.md`,
+          description:
+            'How to query collection schedules and the sorting guide via MCP or the public REST API.',
+          tags: ['skill', 'documentation'],
+          representativeQueries: [
+            'How do I query cand-reciclam as an AI agent?',
+            'Cum aflu programul de colectare programatic?',
+          ],
+        },
+        {
+          identifier: 'urn:air:cand-reciclam.madeinro.eu:api:rest',
+          displayName: 'Când Reciclăm REST API (OpenAPI)',
+          type: 'application/openapi+json',
+          url: `${base}/openapi.json`,
+          description:
+            'OpenAPI description of the public read-only API: streets, per-address schedules, health — with source attribution and data-quality fields.',
+          tags: ['api', 'openapi', 'rest'],
+          representativeQueries: [
+            'List streets with known collection schedules in Sector 1',
+            'Care sunt endpoint-urile API-ului cand-reciclam?',
+          ],
+        },
+        {
+          identifier: 'urn:air:cand-reciclam.madeinro.eu:docs:llms-txt',
+          displayName: 'llms.txt',
+          type: 'text/plain',
+          url: `${base}/llms.txt`,
+          description:
+            'Agent-oriented overview of cand-reciclam and its machine-readable surface.',
+          tags: ['documentation', 'llms-txt'],
+          representativeQueries: [
+            'What is Când Reciclăm and what data does it expose?',
+            'Rezumatul platformei cand-reciclam pentru agenți AI',
+          ],
+        },
+        {
+          identifier: 'urn:air:cand-reciclam.madeinro.eu:docs:auth',
+          displayName: 'auth.md',
+          type: 'text/markdown',
+          url: `${base}/auth.md`,
+          description:
+            'Agent access guide: fully anonymous read-only access; no OAuth metadata because nothing is protected.',
+          tags: ['authentication', 'documentation'],
+          representativeQueries: [
+            'How do agents authenticate to cand-reciclam?',
+            'Ce acces programatic oferă cand-reciclam?',
+          ],
+        },
+      ],
+    });
+});
+
 await app.register(streetsRoutes);
 await app.register(usersRoutes);
 await app.register(geocodeRoutes);
